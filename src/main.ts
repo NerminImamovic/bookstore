@@ -11,6 +11,15 @@ async function bootstrap() {
     origin: '*',
   });
 
+  app.use((request, response, next) => {
+    response.header('Access-Control-Allow-Origin', '*');
+    response.header(
+      'Access-Control-Allow-Headers',
+      'Origin, X-Requested-With, Content-Type, Accept',
+    );
+    next();
+  });
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -25,6 +34,10 @@ async function bootstrap() {
     .setTitle('Bookstore')
     .setDescription('Bookstore Q Agency Task')
     .setVersion('1.0')
+    .addBearerAuth(
+      { type: 'http', scheme: 'Bearer', bearerFormat: 'JWT' },
+      'Authroization', // This name here is important for matching up with @ApiBearerAuth() in your controller!
+    )
     .build();
 
   const document = SwaggerModule.createDocument(app, swaggerConfig);
