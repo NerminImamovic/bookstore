@@ -1,4 +1,4 @@
-import { UserRole } from '../enum';
+import { UserRole } from '../../users/enum';
 import { CanActivate, ExecutionContext, mixin, Type } from '@nestjs/common';
 
 const RoleGuard = (role: UserRole): Type<any> => {

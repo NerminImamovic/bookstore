@@ -3,17 +3,17 @@ import { JwtService } from '@nestjs/jwt';
 
 import { User } from '../users/user.entity';
 import { UsersService } from '../users/users.service';
-import { AuthLoginDto } from './dto/auth-login.dto';
+import { LoginDto, LoginResponseDto } from './dto';
 
 @Injectable()
 export class AuthService {
-  constructor(
+  public constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
   ) {}
 
-  async login(authLoginDto: AuthLoginDto) {
-    const user = await this.validateUser(authLoginDto);
+  public async login(loginDto: LoginDto): Promise<LoginResponseDto> {
+    const user = await this.validateUser(loginDto);
 
     const payload = {
       userId: user.id,
@@ -21,12 +21,16 @@ export class AuthService {
     };
 
     return {
-      access_token: this.jwtService.sign(payload),
+      accessToken: this.jwtService.sign(payload),
     };
   }
 
-  async validateUser(authLoginDto: AuthLoginDto): Promise<User> {
-    const { email, password } = authLoginDto;
+  public async deactivateUser(userId: number) {
+    return this.usersService.dectivateUser(userId);
+  }
+
+  private async validateUser(loginDto: LoginDto): Promise<User> {
+    const { email, password } = loginDto;
 
     const user = await this.usersService.findByEmail(email);
 
@@ -35,9 +39,5 @@ export class AuthService {
     }
 
     return user;
-  }
-
-  async deactivateUser(userId: number) {
-    return this.usersService.dectivateUser(userId);
   }
 }

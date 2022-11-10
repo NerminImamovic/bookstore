@@ -3,84 +3,157 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
   Param,
   Post,
   Put,
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+import { CreateResponseDto } from '../utils/createResponse';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { Book } from './book.entity';
 import { BooksService } from './books.service';
-import { CreateBookDto } from './dto/create-book.dto';
-import { UpdateBookDto } from './dto/update-book.dto';
+import { BookResponseDto, CreateBookDto, UpdateBookDto } from './dto';
 
 @Controller('books')
 @ApiTags('books')
 export class BooksController {
-  constructor(private booksService: BooksService) {}
+  public constructor(private booksService: BooksService) {}
 
-  @ApiResponse({
-    status: 200,
-    description: 'A post has been successfully fetched',
-    type: Array<Book>,
-  })
   @Get()
-  public getBooks() {
-    return this.booksService.getAllBooks();
+  public async getBooks(): Promise<BookResponseDto[]> {
+    const books = await this.booksService.getBooks();
+    return books.map((book) => this.booksService.mapBookToBookResponse(book));
   }
 
   @ApiParam({
     name: 'id',
     required: true,
-    description: 'Should be an id of a book that exists in the database',
+    description: 'Book Id',
     type: Number,
   })
   @ApiResponse({
-    status: 200,
-    description: 'A book has been successfully fetched',
-    type: Book,
-  })
-  @ApiResponse({
     status: 404,
-    description: 'A book with that id does not exist.',
+    description: 'Not Found',
   })
   @Get(':id')
-  getBook(@Param('id') id: number) {
-    return this.booksService.getBook(id);
+  public async getBook(@Param('id') id: number): Promise<BookResponseDto> {
+    const book = await this.booksService.getBook(id);
+
+    return this.booksService.mapBookToBookResponse(book);
   }
 
+  @HttpCode(201)
+  @ApiBody({
+    type: CreateBookDto,
+    required: true,
+    description: 'Book Params',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Created',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthroized',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Fodbidden',
+  })
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('Authroization')
   @Post()
-  createBook(@Req() req: any, @Body() createBookDto: CreateBookDto) {
-    return this.booksService.createBook({
+  public async createBook(
+    @Req() req: any,
+    @Body() createBookDto: CreateBookDto,
+  ): Promise<CreateResponseDto> {
+    const book = await this.booksService.createBook({
       authorizedUserId: req.user.userId,
       createBookDto,
     });
+
+    return { id: book.id };
   }
 
+  @HttpCode(204)
+  @ApiParam({
+    name: 'id',
+    required: true,
+    description: 'Book Id',
+    type: Number,
+  })
+  @ApiBody({
+    type: UpdateBookDto,
+    required: true,
+    description: 'Update Book Transfer Object',
+  })
+  @ApiResponse({
+    status: 204,
+    description: 'No content',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthroized',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Fodbidden',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Not Found',
+  })
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('Authroization')
   @Put(':id/update')
-  updateBook(
+  public async updateBook(
     @Req() req: any,
     @Body() updateBookDto: UpdateBookDto,
     @Param('id') id: number,
-  ) {
-    return this.booksService.updateBook({
+  ): Promise<void> {
+    await this.booksService.updateBook({
       authorizedUserId: req.user.userId,
       bookId: id,
       updateBookDto,
     });
   }
 
+  @HttpCode(204)
+  @ApiParam({
+    name: 'id',
+    required: true,
+    description: 'Book Id',
+    type: Number,
+  })
+  @ApiResponse({
+    status: 204,
+    description: 'No content',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthroized',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Fodbidden',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Not Found',
+  })
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('Authroization')
   @Delete(':id/delete')
-  async delete(@Req() req: any, @Param('id') id: number): Promise<any> {
-    return this.booksService.deleteBook({
+  public async delete(@Req() req: any, @Param('id') id: number): Promise<void> {
+    await this.booksService.deleteBook({
       authorizedUserId: req.user.userId,
       bookId: id,
     });

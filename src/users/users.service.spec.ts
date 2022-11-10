@@ -19,9 +19,10 @@ const validUser: Partial<User> = {
   firstName: 'John',
   lastName: 'Doe',
   email: 'john.doe@example.com',
-  password: 'password',
+  isActive: true,
   id: validUserId,
   role: UserRole.AUTHOR,
+  books: [],
 };
 
 const inactiveAdminId = 2;
@@ -68,21 +69,16 @@ describe('UsersService', () => {
                   }
                 : validUser;
             }),
-            save: jest
-              .fn()
-              // .mockResolvedValueOnce(validUser)
-              // .mockRejectedValue(new Error('Duplicate entry for email'))
-              .mockImplementation((user) => {
-                if (user.email === 'duplicated.email@example.com') {
-                  throw new Error('Duplicate entry ...');
-                } else {
-                  return new Promise((resolve) => resolve(validUser));
-                }
-              }),
+            save: jest.fn().mockImplementation((user) => {
+              if (user.email === 'duplicated.email@example.com') {
+                throw new Error('Duplicate entry ...');
+              } else {
+                return new Promise((resolve) => resolve(validUser));
+              }
+            }),
             find: jest.fn().mockRejectedValue(validUser),
-            findOne: jest.fn().mockResolvedValue(validUserId),
             delete: jest.fn().mockResolvedValue(true),
-            findOneBy: jest.fn().mockImplementation(({ id }) => {
+            findOne: jest.fn().mockImplementation(({ where: { id } }) => {
               if (id === validUserId) {
                 return new Promise((resolve) => {
                   resolve(validUser);
