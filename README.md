@@ -14,7 +14,7 @@ A few things to note in the project:
 
 * **[.env file for configuration](#environment)** - Change server config like app port, mysql url etc
 
-* **[OpenAPI 3.0 Spec Swagger](https://github.com/NerminImamovic/povioTask/blob/master/swagger.json)** - A starter template to get started with API documentation using OpenAPI 3.0. This API spec is also available when running the development server at `http://localhost:3000/api-docs`
+* **[OpenAPI 3.0 Spec Swagger](https://github.com/NerminImamovic/povioTask/blob/master/swagger.json)** - A starter template to get started with API documentation using OpenAPI 3.0. This API spec is also available when running the server at `http://localhost:3000/docs`
 
 
 * **ESLINT** - ESLINT is configured for linting.
@@ -47,7 +47,7 @@ $ npm install
 
 ## II. Configuration
 
-Be sure that you have installed docker on your local machine, and any service related do Mongo is turned off. 
+Be sure that you have installed docker on your local machine, and any service related do MySQL is turned off. 
 
 Configuration is provided in `env.default` file for development and local running, and in `env.test` for the test running. Also for making production build we have configuration in `docker-compose.yml` file.
 
@@ -56,14 +56,19 @@ Read more about **[environment variables](#environment)** used in the project.
 ## III. Development
 
 ### Start dev server
-Starting the dev server also starts MongoDB as a service in a docker container using the compose script at `docker-compose.dev.yml`.
+Starting the dev server also starts MySql as a service in a docker container using the compose script at `docker-compose.local.yml`.
 
 ```
-$ npm run start:dev
+$ docker-compose -f docker-compose.local.yml up -d
+```
+
+```
+$ npm run dev
 ```
 Running the above commands results in 
 * **API Server** running at `http://localhost:3000/`
-* **MongoDB** running at `3306`
+* **Swagger** running at `http://localhost:3000/docs`
+* **MySql** running at PORT `3306`
 
 (feel free to change the env variables in .env.default)
 
@@ -117,7 +122,7 @@ $ npm run migrate
 
 ## V. Test
 
-Run unit tests using next npm script:
+Run unit tests using the next npm script:
 
 ```
 $ npm run test
@@ -139,5 +144,3 @@ There are environment variables for development and test environments in files `
 | DB_PASSWORD  | string  | `password` | DB Password eg: `password`  |
 | DB_NAME  | string  | `database` | DB Type eg: `database`  |
 | JWT_SECRET | string  | `secret` | Jwt Secret |
-
-Feel free to update env variables. 
