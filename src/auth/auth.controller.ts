@@ -1,24 +1,47 @@
-import { Body, Controller, Delete, Post, Req, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  Delete,
+  HttpCode,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
+import { ApiBearerAuth, ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { AuthService } from './auth.service';
-import { AuthLoginDto } from './dto/auth-login.dto';
+import { LoginDto, LoginResponseDto } from './dto';
 import { JwtAuthGuard } from './jwt-auth.guard';
 
 @Controller('auth')
 @ApiTags('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  public constructor(private readonly authService: AuthService) {}
 
+  @HttpCode(200)
+  @ApiBody({
+    type: LoginDto,
+    required: true,
+    description: 'User Params',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthroized',
+  })
   @Post('login')
-  async login(@Body() authLoginDto: AuthLoginDto) {
-    return this.authService.login(authLoginDto);
+  public async login(@Body() loginDto: LoginDto): Promise<LoginResponseDto> {
+    return this.authService.login(loginDto);
   }
 
+  @HttpCode(204)
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthroized',
+  })
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('Authroization')
   @Delete('deactivate')
-  async deactivate(@Req() req: any): Promise<any> {
-    return this.authService.deactivateUser(req.user.userId);
+  public async deactivate(@Req() req: any): Promise<void> {
+    await this.authService.deactivateUser(req.user.userId);
   }
 }

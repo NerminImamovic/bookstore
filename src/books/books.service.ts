@@ -13,20 +13,21 @@ import {
   UpdateBookOptions,
 } from './types';
 import { UserRole } from '../users/enum';
+import { BookResponseDto } from './dto';
 
 @Injectable()
 export class BooksService {
-  constructor(
+  public constructor(
     @InjectRepository(Book)
     private booksRepository: Repository<Book>,
     private userService: UsersService,
   ) {}
 
-  public getAllBooks() {
+  public async getBooks(): Promise<Book[]> {
     return this.booksRepository.find({ relations: ['author'] });
   }
 
-  public async getBook(bookId: number) {
+  public async getBook(bookId: number): Promise<Book> {
     try {
       const book = await this.booksRepository.findOne({
         relations: ['author'],
@@ -46,7 +47,7 @@ export class BooksService {
   public async createBook({
     createBookDto,
     authorizedUserId,
-  }: CreateBookOptions) {
+  }: CreateBookOptions): Promise<Book> {
     const user = await this.userService.getUser(authorizedUserId);
     const author = await this.userService.getUser(createBookDto.authorId);
 
@@ -59,24 +60,19 @@ export class BooksService {
       );
     }
 
-    const book = await this.booksRepository.create({
+    const book = this.booksRepository.create({
       ...createBookDto,
       author,
     });
-    book.author = author;
 
-    await this.booksRepository.save(book);
-
-    return {
-      id: book.id,
-    };
+    return this.booksRepository.save(book);
   }
 
   public async updateBook({
     bookId,
     authorizedUserId,
     updateBookDto,
-  }: UpdateBookOptions) {
+  }: UpdateBookOptions): Promise<boolean> {
     const user = await this.userService.getUser(authorizedUserId);
     const book = await this.getBook(bookId);
 
@@ -124,5 +120,22 @@ export class BooksService {
     } catch (error) {
       throw error;
     }
+  }
+
+  public mapBookToBookResponse(book: Book): BookResponseDto {
+    return {
+      id: book.id,
+      title: book.title,
+      isbn: book.isbn,
+      publishedDate: book.publishedDate,
+      publisher: book.publisher,
+      author: {
+        id: book.author.id,
+        firstName: book.author.firstName,
+        lastName: book.author.lastName,
+        email: book.author.email,
+        role: book.author.role,
+      },
+    };
   }
 }

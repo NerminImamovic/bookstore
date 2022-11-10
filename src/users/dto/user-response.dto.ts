@@ -1,11 +1,12 @@
-import { UserBook } from '../../books/dto/user-book.dto';
+import { UserBook } from '../../books/types/index';
 import { UserRole } from '../enum';
 
 export class UserResponseDto {
+  id: number;
   email: string;
-  password: string;
   firstName: string;
   lastName: string;
+  isActive: boolean;
   role: UserRole;
   books: UserBook[];
 }

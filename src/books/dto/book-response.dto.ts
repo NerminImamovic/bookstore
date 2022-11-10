@@ -1,6 +1,6 @@
-import { BookAuthor } from '../../users/dto/book-author';
+import { BookAuthor } from '../../users/types';
 
-export class BookResponse {
+export class BookResponseDto {
   id: number;
   title: string;
   isbn: string;

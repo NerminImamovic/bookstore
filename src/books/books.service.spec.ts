@@ -5,7 +5,7 @@ import { UsersService } from '../users/users.service';
 import { Book } from './book.entity';
 import { BooksService } from './books.service';
 import { UserRole } from '../users/enum';
-import { CreateBookDto } from './dto/create-book.dto';
+import { CreateBookDto } from './dto';
 import { repositoryMockFactory } from '../utils/mocks';
 
 const authorId = 1;
@@ -81,21 +81,19 @@ describe('BooksService', () => {
             create: jest.fn().mockResolvedValue(validBook),
             save: jest.fn().mockResolvedValue(validBook),
             delete: jest.fn().mockResolvedValue(true),
-            findOne: jest
-              .fn()
-              .mockImplementation(({ relations, where: { id } }) => {
-                if (id === bookId) {
-                  return new Promise((resolve) => {
-                    resolve(validBook);
-                  });
-                }
+            findOne: jest.fn().mockImplementation(({ where: { id } }) => {
+              if (id === bookId) {
+                return new Promise((resolve) => {
+                  resolve(validBook);
+                });
+              }
 
-                if (id === adminBookId) {
-                  return new Promise((resolve) => {
-                    resolve(adminBook);
-                  });
-                }
-              }),
+              if (id === adminBookId) {
+                return new Promise((resolve) => {
+                  resolve(adminBook);
+                });
+              }
+            }),
           })),
         },
       ],

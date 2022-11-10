@@ -6,34 +6,44 @@ import {
 } from '@nestjs/common';
 
 import { User } from './user.entity';
-import { CreateUserDto } from './dto/create-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { UserResponseDto } from './dto/user-response.dto';
+import { UserResponseDto, UpdateUserDto, CreateUserDto } from './dto';
 import { UserRole } from './enum';
-import { UpdateUserDto } from './dto';
 
 @Injectable()
 export class UsersService {
-  constructor(
+  public constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
   ) {}
 
-  async getUsers(): Promise<UserResponseDto[]> {
-    const users = await this.usersRepository.find();
+  async getUsers(): Promise<User[]> {
+    return await this.usersRepository.find({
+      relations: ['books'],
+    });
+  }
 
-    return users.map((user) => this.mapUserToUserResponse(user));
+  public async getUser(id: number): Promise<User> {
+    const user = await this.usersRepository.findOne({
+      relations: ['books'],
+      where: {
+        id,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException('A User with that id does not exist.');
+    }
+
+    return user;
   }
 
   async createUser(createUserDto: CreateUserDto) {
     try {
       const user = this.usersRepository.create(createUserDto);
-      await this.usersRepository.save(user);
 
-      return {
-        id: user.id,
-      };
+      return await this.usersRepository.save(user);
     } catch (err) {
       if (err?.message.startsWith('Duplicate entry')) {
         throw new BadRequestException('User with that email already exsists!');
@@ -84,18 +94,8 @@ export class UsersService {
     }
   }
 
-  public async getUser(id: number): Promise<User> {
-    const user = await this.usersRepository.findOneBy({ id });
-
-    if (!user) {
-      throw new NotFoundException('A User with that id does not exist.');
-    }
-
-    return user;
-  }
-
-  public async findByEmail(email: string) {
-    const user = this.usersRepository.findOneBy({
+  public async findByEmail(email: string): Promise<User> {
+    const user = await this.usersRepository.findOneBy({
       email,
     });
 
@@ -106,7 +106,23 @@ export class UsersService {
     return user;
   }
 
-  private mapUserToUserResponse(user: User): UserResponseDto {
-    return user as UserResponseDto;
+  public mapUserToUserResponse(user: User): UserResponseDto {
+    return {
+      id: user.id,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      role: user.role,
+      isActive: user.isActive,
+      books: user.books
+        ? user.books.map((book) => ({
+            id: book.id,
+            title: book.title,
+            isbn: book.isbn,
+            publishedDate: book.publishedDate,
+            publisher: book.publisher,
+          }))
+        : [],
+    };
   }
 }
