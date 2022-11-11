@@ -137,6 +137,6 @@ export class DatabaseSeeder1668004332344 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    // nothing
+    // do nothing
   }
 }

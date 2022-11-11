@@ -79,17 +79,12 @@ describe('UsersService', () => {
             find: jest.fn().mockRejectedValue(validUser),
             delete: jest.fn().mockResolvedValue(true),
             findOne: jest.fn().mockImplementation(({ where: { id } }) => {
-              if (id === validUserId) {
+              const users = [validUser, inactiveAdmin, activeAdmin];
+              const user = users.find((user) => user.id === id);
+
+              if (user) {
                 return new Promise((resolve) => {
                   resolve(validUser);
-                });
-              } else if (id === inactiveAdminId) {
-                return new Promise((resolve) => {
-                  resolve(inactiveAdmin);
-                });
-              } else if (id === activeAdmin) {
-                return new Promise((resolve) => {
-                  resolve(activeAdmin);
                 });
               }
             }),

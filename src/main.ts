@@ -36,7 +36,7 @@ async function bootstrap() {
     .setVersion('1.0')
     .addBearerAuth(
       { type: 'http', scheme: 'Bearer', bearerFormat: 'JWT' },
-      'Authroization', // This name here is important for matching up with @ApiBearerAuth() in your controller!
+      'Authroization',
     )
     .build();
 
