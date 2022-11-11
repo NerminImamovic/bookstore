@@ -3,20 +3,18 @@
 ## Node.js Booksore Assignment (Q agency) - Nermin Imamovic
 
 A few things to note in the project:
-* **[Github Actions Workflows](https://github.com/NerminImamovic/wtf/tree/master/.github/workflows)** -
+* **[Github Actions Workflows](https://github.com/NerminImamovic/bookstore/tree/master/.github/workflows)** -
 `ci.yml`, continuous integration for the project 
 
-* **[Dockerfile](https://github.com/NerminImamovic/wtf/blob/master/Dockerfile)** - Dockerfile to generate docker builds.
+* **[Dockerfile](https://github.com/NerminImamovic/bookstore/blob/master/Dockerfile)** - Dockerfile to generate docker builds.
 
-* **[docker-compose](https://github.com/NerminImamovic/wtf/blob/master/docker-compose.yml)** - Docker compose script to start service in production mode.
+* **[docker-compose](https://github.com/NerminImamovic/bookstore/blob/master/docker-compose.yml)** - Docker compose script to start service in production mode.
 
 * **[Containerized MySQL for development](#iii-development)** - Starts a local mysql container with data persistence across runs.
 
-* **[.env file for configuration](#environment)** - Change server config like app port, mysql url etc
+* **[.env file for configuration](#environment)** - Change server config like app mysql port etc.
 
-* **[OpenAPI 3.0 Spec Swagger](https://github.com/NerminImamovic/povioTask/blob/master/swagger.json)** - A starter template to get started with API documentation using OpenAPI 3.0. This API spec is also available when running the server at `http://localhost:3000/docs`
-
-
+* **OpenAPI 3.0 Spec Swagger** - A starter template to get started with API documentation using OpenAPI 3.0. This API spec is also available when running the server at `http://localhost:3000/docs`
 * **ESLINT** - ESLINT is configured for linting.
 * **Jest** - Using Jest for running test cases
 
