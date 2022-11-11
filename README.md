@@ -128,7 +128,11 @@ $ npm run test
 
 ---
 
-As the result we will also have code coverage through files.
+Show test coverage using the next npm script:
+
+```
+$ npm run test:cov
+```
 
 ## Environment
 There are environment variables for development and test environments in files `env.default` and `env.test`. For production env variables are in `docker-compose.yml` file.
